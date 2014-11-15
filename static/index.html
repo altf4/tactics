@@ -1,0 +1,130 @@
+<h1>Welcome to Tactics!</h1>
+
+<script src="static/jquery-2.1.1.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#loginbutton").click(function(){
+        $.ajax({
+            url: "/login",
+            type: "POST",
+            data: $("#loginform").serialize(),
+            statusCode: {
+                200: function() {
+                    window.location.replace("lobby");
+                },
+                403: function() {
+                    $("#failedlogin_message").hide();
+                    $("#failedlogin_message").show(500);
+                },
+            }
+        })
+    });
+});
+
+$(document).ready(function() {
+    $("#registerbutton").click(function(){
+        $.ajax({
+            url: "/register",
+            type: "POST",
+            data: $("#registerform").serialize(),
+            statusCode: {
+                200: function() {
+                    $("#no_blanks_message").hide();
+                    $("#account_exists_message").hide();
+                    $("#passwords_not_equal_message").hide();
+                    $("#register_success_message").hide();
+                    $("#register_success_message").show(500);
+                },
+                400: function() {
+                    $("#no_blanks_message").hide();
+                    $("#account_exists_message").hide();
+                    $("#passwords_not_equal_message").hide();
+                    $("#register_success_message").hide();
+                    $("#no_blanks_message").show(500);
+                },
+                422: function() {
+                    $("#no_blanks_message").hide();
+                    $("#account_exists_message").hide();
+                    $("#passwords_not_equal_message").hide();
+                    $("#register_success_message").hide();
+                    $("#passwords_not_equal_message").show(500);
+                },
+                401: function() {
+                    $("#no_blanks_message").hide();
+                    $("#account_exists_message").hide();
+                    $("#passwords_not_equal_message").hide();
+                    $("#register_success_message").hide();
+                    $("#account_exists_message").show(500);
+                },
+            }
+        })
+    });
+});
+
+$(document).ready(function() {
+    $("#register_text").click(function(){
+        $("#failedlogin_message").hide();
+        $("#loginform").hide();
+        $("#loginbutton").hide();
+        $("#register_text").hide();
+        $("#registerform").show(100);
+        $("#registerbutton").show(100);
+        $("#login_text").show(100);
+    });
+});
+
+$(document).ready(function() {
+    $("#login_text").click(function(){
+        $("#registerform").hide();
+        $("#registerbutton").hide();
+        $("#login_text").hide();
+        $("#loginform").show(100);
+        $("#loginbutton").show(100);
+        $("#register_text").show(100);
+    });
+});
+</script>
+
+<form id="loginform" action="/login" method="POST">
+    Username:
+    <br>
+    <input type="text" name="name" value="">
+    <br>
+    Password:
+    <br>
+    <input type="password" name="password" value="">
+    <br>
+</form>
+
+<input id="loginbutton" type="submit" value="Log in">
+<p id="failedlogin_message" style="display: none">Incorrect username or password</p>
+
+<p id="spacer"></p>
+
+<a id="register_text" href="#">Register an account</a>
+
+<form id="registerform" action="/register" method="POST" style="display: none">
+    Username:
+    <br>
+    <input type="text" name="name" value="">
+    <br>
+    Enter Password:
+    <br>
+    <input type="password" name="password1" value="">
+    <br>
+    Re-enter Password:
+    <br>
+    <input type="password" name="password2" value="">
+    <br>
+</form>
+<input id="registerbutton" type="submit" value="Register" style="display: none">
+<br>
+
+<p id="no_blanks_message" style="display: none">No blank values allowed!</p>
+<p id="account_exists_message" style="display: none">Username is already registered.</p>
+<p id="passwords_not_equal_message" style="display: none">Entered passwords do not match!</p>
+<p id="register_success_message" style="display: none">Successfully registered!</p>
+
+
+<a id="login_text" href="#" style="display: none">Log in to an account</a>
