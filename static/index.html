@@ -1,3 +1,12 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Tactics</title>
+    <link rel="stylesheet" href="{{ static_url("index.css") }}" type="text/css"/>
+</head>
+
 <h1>Welcome to Tactics!</h1>
 
 <script src="static/jquery-2.1.1.min.js"></script>
@@ -94,6 +103,7 @@ $(document).ready(function() {
     Password:
     <br>
     <input type="password" name="password" value="">
+    {% module xsrf_form_html() %}
     <br>
 </form>
 
@@ -116,6 +126,7 @@ $(document).ready(function() {
     Re-enter Password:
     <br>
     <input type="password" name="password2" value="">
+    {% module xsrf_form_html() %}
     <br>
 </form>
 <input id="registerbutton" type="submit" value="Register" style="display: none">
@@ -128,3 +139,5 @@ $(document).ready(function() {
 
 
 <a id="login_text" href="#" style="display: none">Log in to an account</a>
+
+</html>

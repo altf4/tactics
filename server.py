@@ -1,10 +1,13 @@
 import tornado.escape
 import tornado.ioloop
 import tornado.web
+import tornado.websocket
 import MySQLdb.constants
 import torndb
 import ConfigParser
 import bcrypt
+import logging
+import uuid
 from datetime import date
 
 class Application(tornado.web.Application):
@@ -12,6 +15,7 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/", IndexHandler),
             (r"/lobby", LobbyHandler),
+            (r"/chatsocket", ChatSocketHandler),
             (r"/getgamebyid/([0-9]+)", GetGameByIdHandler),
             (r"/version", VersionHandler),
             (r"/register", RegisterUserHandler),
@@ -29,6 +33,7 @@ class Application(tornado.web.Application):
         settings = dict(
             cookie_secret = secure_cookie_key,
             static_path = "static",
+            xsrf_cookies = True,
             login_url = "/",
         )
 
@@ -48,18 +53,52 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class IndexHandler(BaseHandler):
     def get(self):
-        #There's probably a better way to serve this file. maybe tornado's StaticFileHandler?
-        file = open('static/index.html', 'r')
-        response = file.read()
-        self.write(response)
+        self.render("static/index.html")
 
 class LobbyHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-        #There's probably a better way to serve this file. maybe tornado's StaticFileHandler?
-        file = open('static/lobby.html', 'r')
-        response = file.read()
-        self.write(response)
+        self.render("static/lobby.html", messages = ChatSocketHandler.cache)
+
+class ChatSocketHandler(tornado.websocket.WebSocketHandler):
+    waiters = set()
+    cache = []
+    cache_size = 200
+
+    def open(self):
+        ChatSocketHandler.waiters.add(self)
+
+    def on_close(self):
+        ChatSocketHandler.waiters.remove(self)
+
+    @classmethod
+    def update_cache(cls, chat):
+        cls.cache.append(chat)
+        if len(cls.cache) > cls.cache_size:
+            cls.cache = cls.cache[-cls.cache_size:]
+
+    @classmethod
+    def send_updates(cls, chat):
+        logging.info("sending message to %d waiters", len(cls.waiters))
+        for waiter in cls.waiters:
+            try:
+                waiter.write_message(chat)
+            except:
+                logging.error("Error sending message", exc_info=True)
+
+    def on_message(self, message):
+        logging.info("got message %r", message)
+        parsed = tornado.escape.json_decode(message)
+        userid = self.get_secure_cookie("userid", max_age_days=1)
+        chat = {
+            "id": str(uuid.uuid4()),
+            "body": parsed["body"],
+            }
+        chat["html"] = tornado.escape.to_basestring(
+            self.render_string("static/chatmessage.html", user=userid, message=chat))
+
+        ChatSocketHandler.update_cache(chat)
+        ChatSocketHandler.send_updates(chat)
 
 class VersionHandler(BaseHandler):
     def get(self):
@@ -112,5 +151,5 @@ class LoginHandler(BaseHandler):
 
 if __name__ == "__main__":
     application = Application()
-    application.listen(8888)
+    application.listen(8080)
     tornado.ioloop.IOLoop.instance().start()
