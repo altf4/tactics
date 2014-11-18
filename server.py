@@ -63,7 +63,7 @@ class LobbyHandler(BaseHandler):
 class ChatSocketHandler(tornado.websocket.WebSocketHandler):
     waiters = set()
     cache = []
-    cache_size = 200
+    cache_size = 100
 
     def open(self):
         ChatSocketHandler.waiters.add(self)
@@ -89,13 +89,13 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         logging.info("got message %r", message)
         parsed = tornado.escape.json_decode(message)
-        userid = self.get_secure_cookie("userid", max_age_days=1)
         chat = {
             "id": str(uuid.uuid4()),
             "body": parsed["body"],
+            "userid": self.get_secure_cookie("userid", max_age_days=1),
             }
         chat["html"] = tornado.escape.to_basestring(
-            self.render_string("static/chatmessage.html", user=userid, message=chat))
+            self.render_string("static/chatmessage.html", message=chat))
 
         ChatSocketHandler.update_cache(chat)
         ChatSocketHandler.send_updates(chat)

@@ -27,5 +27,13 @@ socket.onmessage = function(event)
 $(document).ready(function() {
     $("#messagebutton").click(function(){
         socket.send(JSON.stringify($("#messageform").serializeObject()));
+        document.getElementById("message").value = "";
     });
 });
+
+function submitChatForm()
+{
+    socket.send(JSON.stringify($("#messageform").serializeObject()));
+    document.getElementById("message").value = "";
+    return false;
+}
