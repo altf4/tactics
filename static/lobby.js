@@ -37,3 +37,32 @@ function submitChatForm()
     document.getElementById("message").value = "";
     return false;
 }
+
+var finding_match = false;
+var queue_socket
+
+$(document).ready(function() {
+    $("#findmatchbutton").click(function(){
+        finding_match = !finding_match;
+        if(finding_match) {
+            document.getElementById("findmatchbutton").value = "Cancel Search";
+            document.getElementById("matchprogress").style = "";
+
+            queue_socket = new WebSocket("ws://" + location.host + "/queuesocket");
+            queue_socket.onmessage = function(event)
+            {
+                document.getElementById("findmatchbutton").value = "Find Match";
+                document.getElementById("matchprogress").style = "display: none";
+                queue_socket.close();
+                $("#match_found_message").show(2000);
+                var data = JSON.parse(event.data);
+                window.location.replace("match/" + data["match_id"]);
+            }
+        }
+        else {
+            document.getElementById("findmatchbutton").value = "Find Match";
+            document.getElementById("matchprogress").style = "display: none";
+            queue_socket.close();
+        }
+    });
+});

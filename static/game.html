@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <script src="static/playcanvas.js"></script>
+    <script src="{{ static_url("playcanvas.js") }}"></script>
 </head>
 
 <body>
@@ -24,7 +24,7 @@
 
         var entity, light, camera;
 
-        var url = "static/assets/statue_1.json";
+        var url = "{{ static_url("assets/statue_1.json") }}";
 
         application.context.assets.loadFromUrl(url, "model").then(function (results) {
             var model = results.resource;

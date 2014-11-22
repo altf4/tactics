@@ -10,6 +10,12 @@
     <link rel="stylesheet" href="{{ static_url("lobby.css") }}" type="text/css"/>
 </head>
 
+<input id = "findmatchbutton" type="submit" value="Find Match"/>
+<br>
+<progress id="matchprogress" max="100" style="display: none"></progress>
+<br>
+<p id="match_found_message" style="display: none">Match found!</p>
+
 <body>
  <div id="body">
       <div id="inbox">
@@ -28,9 +34,13 @@
             </tr>
           </table>
         </form>
-        <input id = "messagebutton" type="submit" />
+        <input id = "messagebutton" type="submit" value="Post Message"/>
       </div>
     </div>
 </body>
+
+<form id="csrf_form_helper">
+    {% module xsrf_form_html() %}
+</form>
 
 </html>

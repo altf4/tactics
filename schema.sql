@@ -12,3 +12,11 @@ CREATE TABLE users (
     elo INT NOT NULL,
     KEY (id)
 );
+
+DROP TABLE IF EXISTS matches;
+CREATE TABLE matches (
+    id VARCHAR(40) PRIMARY KEY,
+    player_one VARCHAR(20) NOT NULL,
+    player_two VARCHAR(20) NOT NULL,
+    KEY (id)
+);
